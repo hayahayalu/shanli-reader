@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>山梨阅读器 · 图标</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    background: transparent;      /* 截图要带 alpha，底必须是透明的 */
+    overflow: hidden;
+  }
+  /* 图标画在左上角的 stage 里，尺寸由 setIconSize() 指定。
+     外面的空区域留给截图工具用 capturePage(rect) 精确裁切。 */
+  #stage {
+    position: absolute; left: 0; top: 0; width: 256px; height: 256px;
+    overflow: hidden; background: transparent;
+  }
+  svg { display: block; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<!--
+  设计：深色圆角方盘（＝桌面上那个方框窗口），盘心一只熟透的梨（＝「山梨」），
+  梨背后一圈暖色光晕（＝灯下果子的暖调，也让深色盘面不发死）。
+  梨身全靠一条连续的轮廓线收出来：细颈 + 下坠的果腹，再配短梗与叶，
+  这样缩到 16px 也不会被误认成灯泡或苹果。
+  笔画全是实心块面、没有细描边；小尺寸再单独换一套几何（见文件末尾的 ICON_TIERS）。
+-->
+<div id="stage">
+<svg id="ico" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="plate" x1="0.05" y1="0" x2="0.95" y2="1">
+      <stop offset="0"    stop-color="#2e2b26" />
+      <stop offset="0.5"  stop-color="#1e1c18" />
+      <stop offset="1"    stop-color="#100f0d" />
+    </linearGradient>
+
+    <!-- 暖色光晕，压在梨背后 -->
+    <radialGradient id="glow" cx="50%" cy="50%" r="52%">
+      <stop id="glow0" offset="0"   stop-color="#ffcf95" stop-opacity="0.40" />
+      <stop id="glow1" offset="0.5" stop-color="#ffb166" stop-opacity="0.14" />
+      <stop id="glow2" offset="1"   stop-color="#ff9f45" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- 盘面顶部一道柔光，让方盘不像一块死黑 -->
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#ffffff" stop-opacity="0.14" />
+      <stop offset="0.42" stop-color="#ffffff" stop-opacity="0.02" />
+      <stop offset="1"    stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- 果身：左上受光、右下入影，一个渐变就把体积交代清楚 -->
+    <linearGradient id="pearFill" x1="0.15" y1="0.05" x2="0.9" y2="1">
+      <stop offset="0"    stop-color="#ffedbb" />
+      <stop offset="0.42" stop-color="#f3c069" />
+      <stop offset="1"    stop-color="#cb8a30" />
+    </linearGradient>
+
+    <!-- 高光用径向渐变填，边缘自然消失；硬边椭圆看着像一块水渍 -->
+    <radialGradient id="shineFill" cx="42%" cy="38%" r="62%">
+      <stop offset="0"    stop-color="#ffffff" stop-opacity="0.55" />
+      <stop offset="0.5"  stop-color="#ffffff" stop-opacity="0.18" />
+      <stop offset="1"    stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- 叶子偏青绿，和金色的果身拉开色相，16px 下也能一眼看出不是同一块 -->
+    <linearGradient id="leafFill" x1="0.1" y1="1" x2="0.9" y2="0">
+      <stop offset="0"   stop-color="#8ba03c" />
+      <stop offset="1"   stop-color="#dbe492" />
+    </linearGradient>
+
+    <clipPath id="plateClip">
+      <rect x="1" y="1" width="98" height="98" rx="23" />
+    </clipPath>
+
+    <!-- 柔光必须裁在果身里，否则会溢到盘面上变成一块灰斑 -->
+    <clipPath id="pearClip">
+      <path d="M50 26
+               C46.5 26 43.2 29.6 42.5 34
+               C41.6 39.5 26 49 26 60
+               C26 72 38 88 50 88
+               C62 88 74 72 74 60
+               C74 49 58.4 39.5 57.5 34
+               C56.8 29.6 53.5 26 50 26 Z" />
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#plateClip)">
+    <rect x="1" y="1" width="98" height="98" rx="23" fill="url(#plate)" />
+    <rect x="1" y="1" width="98" height="98" fill="url(#glow)" />
+    <rect x="1" y="1" width="98" height="98" rx="23" fill="url(#sheen)" />
+  </g>
+
+  <!-- 一圈极淡的内描边：让方盘边界在深色桌面上也立得住 -->
+  <rect x="1.7" y="1.7" width="96.6" height="96.6" rx="22.3"
+        fill="none" stroke="#ffffff" stroke-opacity="0.13" stroke-width="1.2" />
+
+  <g id="glyph">
+    <!-- 梗与叶先画，果身压在上面 —— 看起来就是「从果子里长出来」 -->
+    <path id="stem" d="M51 28 C51.3 23 52.9 18.4 56.4 15.4"
+          fill="none" stroke="#b98a52" stroke-width="4.6" stroke-linecap="round" />
+    <path id="leaf" d="M72.5 8.6 C70.8 15.4 64.4 19.4 55.8 16.2 C60 10 66.6 7.2 72.5 8.6 Z"
+          fill="url(#leafFill)" />
+    <path id="midrib" d="M57.4 15.4 C61.5 11.6 66.4 9.6 70.9 9.2"
+          fill="none" stroke="#5f6a22" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round" />
+
+    <!-- 梨：一条连续轮廓。细颈 → 肩部快速外扩 → 下坠的果腹，底部圆而沉 -->
+    <path id="pear" fill="url(#pearFill)"
+          d="M50 26
+             C46.5 26 43.2 29.6 42.5 34
+             C41.6 39.5 26 49 26 60
+             C26 72 38 88 50 88
+             C62 88 74 72 74 60
+             C74 49 58.4 39.5 57.5 34
+             C56.8 29.6 53.5 26 50 26 Z" />
+
+    <!-- 一点柔光，果子才有「熟的」那层光（裁在果身内） -->
+    <ellipse id="shine" cx="40" cy="52" rx="11" ry="15"
+             transform="rotate(-16 40 52)" clip-path="url(#pearClip)"
+             fill="url(#shineFill)" opacity="0.55" />
+  </g>
+</svg>
+</div>
+
+<script>
+  /* 小尺寸单独一套几何（每个尺寸都是自己光栅化的，不是缩位图）：
+     - <=20px：梗加粗到约 1.4px、缩短；叶子换成更短更胖的一枚；高光和叶脉直接不画（画了只是脏）。
+     - <=32px：梗加粗一点，叶脉不画（0.3px 的线只会让叶子发灰）。
+     不做这一步的话，16px 下就是一颗糊成一块的浅色蛋。 */
+  var ICON_TIERS = {
+    full: {
+      glyph: 'translate(51 49) scale(0.96) translate(-51 -49)',
+      stem: { d: 'M51 28 C51.3 23 52.9 18.4 56.4 15.4', 'stroke-width': 4.6 },
+      leaf: { d: 'M72.5 8.6 C70.8 15.4 64.4 19.4 55.8 16.2 C60 10 66.6 7.2 72.5 8.6 Z' },
+      midrib: { display: '', 'stroke-width': 1.6 },
+      shine: { display: '', opacity: 0.55 },
+      glowC: '50%', glowR: '52%', glow0: 0.40, glow1: 0.14,
+    },
+    small: {
+      glyph: 'translate(51 49) scale(1.04) translate(-51 -49)',
+      stem: { d: 'M51 28 C51.3 23.2 52.8 18.8 56.2 15.8', 'stroke-width': 5.8 },
+      leaf: { d: 'M72 9.4 C70.4 15.6 64.8 19.2 56.8 16.4 C60.6 11 66.6 8.2 72 9.4 Z' },
+      midrib: { display: 'none' },
+      shine: { display: '', opacity: 0.45 },
+      glowC: '50%', glowR: '54%', glow0: 0.44, glow1: 0.16,
+    },
+    tiny: {
+      glyph: 'translate(51 49) scale(1.13) translate(-51 -49)',
+      stem: { d: 'M51 28.4 C51.3 24.8 52.5 22.2 54.4 20.4', 'stroke-width': 7.4 },
+      leaf: { d: 'M69.6 13.6 C68.4 19.4 62.8 22.6 56 20.8 C59.6 15 64.8 12.2 69.6 13.6 Z' },
+      midrib: { display: 'none' },
+      shine: { display: 'none' },
+      glowC: '50%', glowR: '56%', glow0: 0.50, glow1: 0.18,
+    },
+  };
+
+  function applyTier(size) {
+    var s = parseInt(size, 10) || 256;
+    var tier = s <= 20 ? 'tiny' : (s <= 32 ? 'small' : 'full');
+    var spec = ICON_TIERS[tier];
+
+    var set = function (id, attrs) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      Object.keys(attrs).forEach(function (k) { el.setAttribute(k, attrs[k]); });
+    };
+
+    set('glyph', { transform: spec.glyph });
+    set('stem', spec.stem);
+    set('leaf', spec.leaf);
+    set('midrib', spec.midrib);
+    set('shine', spec.shine);
+    set('glow', { cx: spec.glowC, r: spec.glowR });
+    set('glow0', { 'stop-opacity': spec.glow0 });
+    set('glow1', { 'stop-opacity': spec.glow1 });
+
+    document.documentElement.setAttribute('data-size', String(s));
+    return tier;
+  }
+
+  /** 把图标画成 n×n：容器尺寸决定 SVG 的映射比例，笔画粗细由 tier 决定 */
+  window.setIconSize = function (n) {
+    var size = Math.max(1, parseInt(n, 10) || 256);
+    var stage = document.getElementById('stage');
+    stage.style.width = size + 'px';
+    stage.style.height = size + 'px';
+    return applyTier(size);
+  };
+
+  window.applyTier = applyTier;
+  setIconSize(256);
+</script>
+</body>
+</html>

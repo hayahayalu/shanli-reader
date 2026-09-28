@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:;" />
+<title>山梨阅读器</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 整个窗口就是一个干净的方框 -->
+  <div id="frame" class="frame">
+    <div id="stage" class="stage">
+      <div id="viewport" class="viewport">
+        <div id="content" class="content" tabindex="0"></div>
+      </div>
+
+      <!-- 空状态：只在没有书的时候出现，极度克制 -->
+      <div id="empty" class="empty">
+        <div class="empty-inner">
+          <div class="empty-mark">▢</div>
+          <div class="empty-title">山梨阅读器</div>
+          <div class="empty-sub">在此处右键 →「导入书籍…」</div>
+        </div>
+      </div>
+
+      <!-- 边缘翻页热区（鼠标靠近左右边缘时出现） -->
+      <div class="edge edge-left"  data-nav="prev"><span>‹</span></div>
+      <div class="edge edge-right" data-nav="next"><span>›</span></div>
+    </div>
+
+    <!-- 进度条：极细，鼠标移入才显示 -->
+    <div id="progress" class="progress"><div id="bar" class="bar"></div></div>
+
+    <!-- 悬浮提示 -->
+    <div id="toast" class="toast"></div>
+
+    <!-- 临时提示：跳转后短暂显示页码 -->
+    <div id="hud" class="hud"></div>
+
+    <!-- 离屏量尺：分页引擎用它测量文本高度，不可见、不参与交互 -->
+    <div id="measure" class="measure" aria-hidden="true"></div>
+  </div>
+
+  <!-- 跳转对话框 -->
+  <div id="jump" class="modal">
+    <div class="modal-box">
+      <div class="modal-title">跳转至</div>
+      <input id="jumpInput" class="modal-input" type="text" spellcheck="false"
+             placeholder="章节号 / 页码 / 百分比，例如  12  480  36%" />
+      <div class="modal-hint" id="jumpHint"></div>
+      <div class="modal-actions">
+        <button id="jumpCancel" class="btn">取消</button>
+        <button id="jumpOk" class="btn btn-primary">跳转</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 目录 -->
+  <div id="toc" class="modal">
+    <div class="modal-box modal-wide">
+      <div class="modal-title">目录</div>
+      <div id="tocList" class="toc-list"></div>
+      <div class="modal-actions">
+        <button id="tocClose" class="btn">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

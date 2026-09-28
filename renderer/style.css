@@ -1,0 +1,501 @@
+/* ============================================================
+   山梨阅读器 — 样式
+   整个窗口就是一个干净方框：底色可改、可完全透明、可缩到极小
+   ============================================================ */
+
+:root {
+  /* 默认：底色完全透明 + 米白文字，一个悬浮在桌面上的小方框 */
+  --bg: #1e1e1e;
+  --bg-alpha: 0;
+  --fg: #e8e4dc;
+  --fg-dim: #8a8172;
+  --fs: 14px;
+  --lh: 1.6;
+  --ff: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --pad-x: 26px;
+  --pad-y: 20px;
+  --radius: 10px;
+  /* 方框描边：底色默认透明，窗口边界必须自己画出来。
+     深色外圈 + 浅色内圈，无论桌面壁纸是明是暗都看得见 */
+  --frame-ring: rgba(0, 0, 0, .42);
+  --frame-ring-in: rgba(255, 255, 255, .16);
+  /* 文字投影：透明底时保证在任何壁纸上都读得清（深浅两色桌面都试过） */
+  --shadow: 0 1px 2px rgba(0, 0, 0, .9), 0 0 5px rgba(0, 0, 0, .65);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent !important;
+  user-select: none;
+  cursor: default;
+}
+
+body {
+  font-family: var(--ff);
+  color: var(--fg);
+}
+
+/* ---------- 方框本体 ---------- */
+
+.frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  /* 边界画在 .frame 上（不在背景层上）——背景层整体带 opacity，
+     底色透明时会把边框一起抹掉，窗口就完全看不见了 */
+  border: 1px solid var(--frame-ring);
+  box-shadow: inset 0 0 0 1px var(--frame-ring-in);
+  /* -webkit-app-region 由 JS 按需设置 */
+}
+
+/* 底色层：单独一层，透明度只作用于它，不影响文字与描边 */
+.frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  opacity: var(--bg-alpha);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.frame.no-frame {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* ---------- 阅读区 ---------- */
+
+.stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  z-index: 1;
+  display: flex;
+}
+
+.viewport {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.content {
+  position: absolute;
+  inset: 0;
+  padding: var(--pad-y) var(--pad-x);
+  font-size: var(--fs);
+  line-height: var(--lh);
+  color: var(--fg);
+  text-shadow: var(--shadow);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  text-align: justify;
+  text-justify: inter-ideograph;
+  outline: none;
+  overflow: hidden;
+  user-select: text;
+  cursor: text;
+}
+
+.content.no-select {
+  user-select: none;
+}
+
+.content.bold {
+  font-weight: 600;
+}
+
+/* 章节小标题（分页时若出现在页首会高亮一点） */
+.content .ct {
+  display: block;
+  color: var(--fg);
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+/* 首行缩进（可用右键关掉——目前固定 2 字符，中文阅读习惯） */
+.content.indent p,
+.content.indent .p {
+  text-indent: 2em;
+}
+
+/* ---------- 空状态 ---------- */
+
+.empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+  transition: opacity .25s;
+}
+
+.empty.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.empty-inner {
+  text-align: center;
+  color: var(--fg);
+  text-shadow: var(--shadow);
+  opacity: .55;
+}
+
+.empty-mark {
+  font-size: 40px;
+  line-height: 1;
+  margin-bottom: 12px;
+  opacity: .5;
+}
+
+.empty-title {
+  font-size: 15px;
+  letter-spacing: .18em;
+  margin-bottom: 6px;
+}
+
+.empty-sub {
+  font-size: 12px;
+  opacity: .8;
+}
+
+/* 极小窗口时隐藏空状态文字，避免撑破布局 */
+body.tiny .empty-inner { display: none; }
+body.tiny .content { padding: 4px 8px; }
+
+/* ---------- 边缘翻页热区 ---------- */
+
+.edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: var(--fg);
+  opacity: 0;
+  transition: opacity .18s;
+  z-index: 3;
+  cursor: pointer;
+}
+
+.edge-left  { left: 0;  justify-content: flex-start; padding-left: 6px; }
+.edge-right { right: 0; justify-content: flex-end;   padding-right: 6px; }
+
+.edge:hover { opacity: .35; }
+
+body.no-edges .edge { display: none; }
+
+/* ---------- 进度条 ---------- */
+
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  z-index: 4;
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+}
+
+.frame:hover .progress { opacity: 1; }
+
+.progress .bar {
+  height: 100%;
+  width: 0%;
+  background: currentColor;
+  opacity: .35;
+  transition: width .18s ease-out;
+}
+
+/* ---------- HUD（页码提示） ---------- */
+
+.hud {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  z-index: 5;
+  font-size: 11px;
+  letter-spacing: .06em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  /* 固定深色药丸 + 浅字：底色可能完全透明（桌面壁纸任意），
+     跟随主题取色反而会出现「浅底浅字」看不清 */
+  background: rgba(18, 18, 18, .72);
+  color: #f2efe9;
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity .25s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.hud.show { opacity: .75; }
+
+/* ---------- Toast ---------- */
+
+.toast {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9;
+  font-size: 12.5px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--fg) 82%, transparent);
+  color: var(--bg);
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 86%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toast.show { opacity: .92; }
+
+/* ---------- 模态：跳转 / 目录 ---------- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, .28);
+  backdrop-filter: blur(2px);
+}
+
+.modal.show { display: flex; }
+
+.modal-box {
+  width: min(420px, 88vw);
+  background: #ffffff;
+  color: #1a1a1a;
+  border-radius: 12px;
+  padding: 18px 18px 14px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .3);
+  font-size: 13px;
+}
+
+.modal-wide {
+  width: min(560px, 92vw);
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  margin-bottom: 12px;
+  opacity: .8;
+}
+
+.modal-input {
+  width: 100%;
+  height: 34px;
+  border: 1px solid #d8d3c9;
+  border-radius: 8px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  background: #fdfbf7;
+  color: #1a1a1a;
+}
+
+.modal-input:focus { border-color: #9a8f78; }
+
+.modal-hint {
+  margin-top: 8px;
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: #8a8172;
+  min-height: 34px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.btn {
+  height: 30px;
+  padding: 0 14px;
+  border: 1px solid #d8d3c9;
+  border-radius: 8px;
+  background: #f7f4ee;
+  color: #3a3a3a;
+  font-size: 12.5px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.btn:hover { background: #efeae1; }
+
+.btn-primary {
+  background: #2f2a22;
+  border-color: #2f2a22;
+  color: #f7f4ee;
+}
+
+.btn-primary:hover { background: #423a2e; }
+
+.toc-list {
+  flex: 1;
+  overflow: auto;
+  margin: -4px -4px 4px;
+  padding: 4px;
+  border-top: 1px solid #eee7da;
+  border-bottom: 1px solid #eee7da;
+}
+
+.toc-item {
+  padding: 7px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #3a3a3a;
+  display: flex;
+  gap: 8px;
+}
+
+.toc-item:hover { background: #f2ede3; }
+
+.toc-item.active {
+  background: #e8e0d0;
+  font-weight: 600;
+}
+
+.toc-item .idx {
+  width: 30px;
+  flex: none;
+  opacity: .5;
+  font-variant-numeric: tabular-nums;
+}
+
+.toc-item .txt {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, .35);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, .55); }
+
+/* ---------- 单行模式 ---------- */
+
+body.single .content {
+  inset: 0;
+  padding: 0 14px;
+  /* 必须用 pre：nowrap 会把连续空格折成一个、并吃掉行首行尾空格，
+     而测量是按 flatLine 逐字符算宽度的，两边规则不一致就会裁掉行尾。
+     pre 下空格 1:1 保留，测量与渲染才完全对齐。 */
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: clip;
+  text-align: left;
+  text-justify: none;
+  display: block;
+  line-height: 1;
+  height: 100%;
+  /* 翻页时不做任何过渡：单行每次只走一行，位移/淡入看起来就是文字在抖 */
+  transition: none;
+}
+
+/* 单行模式下把文字垂直居中：用 flex 包一层会破坏高度测量，
+   所以这里改用 padding 让单行文字落在窗口中间 */
+body.single .viewport { display: flex; flex-direction: column; justify-content: center; }
+body.single .content { position: static; width: 100%; height: auto; flex: none; }
+
+body.single .empty { display: none; }
+body.single .progress { height: 2px; }
+body.single .edge { display: none; }
+body.single .hud {
+  bottom: 50%;
+  transform: translateY(50%);
+  right: 8px;
+  font-size: 10px;
+  padding: 1px 7px;
+}
+
+/* 离屏量尺：排版规则与「正常分页」一致，任何模式下都不被 body.single 影响。
+   去掉浏览器的默认最小高度（否则窗口很矮时会量不准，退化成「一页一个字」） */
+#measure {
+  position: absolute;
+  left: -99999px;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: -1;
+  min-height: 0 !important;
+  padding: var(--pad-y) var(--pad-x);
+  font-family: var(--ff);
+  font-size: var(--fs);
+  line-height: var(--lh);
+  font-weight: 400;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  text-align: justify;
+  text-justify: inter-ideograph;
+  overflow: hidden;
+}
+
+#measure.bold { font-weight: 600; }
+
+/* 单行量尺：不换行，用 scrollWidth 量一行能放多少字符 */
+#measure.nowrap {
+  white-space: pre !important;
+  overflow: hidden;
+  text-align: left;
+}
+
+/* ---------- 拖拽区 ---------- */
+
+.drag-region {
+  -webkit-app-region: drag;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}

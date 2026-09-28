@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>山梨阅读器 · 图标尺寸对照</title>
+<style>
+  html, body { margin: 0; width: 960px; height: 430px; font-family: "Microsoft YaHei", system-ui, sans-serif; }
+  .band { height: 215px; box-sizing: border-box; padding: 16px 22px; }
+  .light { background: #f2f0eb; color: #2a2723; }
+  .dark  { background: #201e1b; color: #d9d4ca; }
+  .cap { font-size: 12px; letter-spacing: .08em; opacity: .7; margin-bottom: 10px; }
+  .row { display: flex; align-items: flex-end; gap: 18px; }
+  .cell { text-align: center; }
+  .cell .big { display: flex; align-items: flex-end; justify-content: center; height: 96px; }
+  /* 小尺寸按像素放大看：Windows 任务栏拿到的就是这几个像素 */
+  .cell img { display: block; }
+  .px { image-rendering: pixelated; }
+  .lab { font-size: 10px; margin-top: 6px; opacity: .6; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+  <div class="band light">
+    <div class="cap">1 : 1 —— 尺寸逐级对照（浅色桌面）</div>
+    <div class="row" id="rowLight"></div>
+  </div>
+  <div class="band dark">
+    <div class="cap">6 × 放大 —— 看小尺寸在这种像素量下还剩多少信息（深色桌面）</div>
+    <div class="row" id="rowDark"></div>
+  </div>
+
+<script>
+  var ALL = [16, 20, 24, 32, 40, 48, 64, 128, 256];
+  /* 放大档只挑「靠简化几何活着」的那几档：48px 已经是完整几何，放大看没意义 */
+  var ZOOM = [16, 20, 24, 32];
+  var ZOOM_X = 6;
+
+  function cell(size, zoom, px) {
+    var box = document.createElement('div');
+    box.className = 'cell';
+    var big = document.createElement('div');
+    big.className = 'big';
+    var img = document.createElement('img');
+    img.src = 'png/icon-' + size + '.png';
+    img.width = size * zoom;
+    img.height = size * zoom;
+    if (px) img.className = 'px';
+    big.appendChild(img);
+    var lab = document.createElement('div');
+    lab.className = 'lab';
+    lab.textContent = size + 'px' + (zoom > 1 ? ' ×' + zoom : '');
+    box.appendChild(big);
+    box.appendChild(lab);
+    return box;
+  }
+
+  ALL.forEach(function (s) { document.getElementById('rowLight').appendChild(cell(s, 1, false)); });
+  ZOOM.forEach(function (s) { document.getElementById('rowDark').appendChild(cell(s, ZOOM_X, true)); });
+</script>
+</body>
+</html>

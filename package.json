@@ -1,0 +1,74 @@
+{
+  "name": "shanli-reader",
+  "productName": "山梨阅读器",
+  "version": "0.1.0",
+  "description": "极简本地电子书阅读器 (txt / epub)，单行阅读模式",
+  "main": "main.js",
+  "scripts": {
+    "start": "node tools/run-electron.js .",
+    "dev": "node tools/run-electron.js . --dev",
+    "build": "node tools/build-exe.js",
+    "build:exe": "node tools/build-exe.js",
+    "build:dir": "node tools/build-exe.js --dir",
+    "verify:build": "node tools/verify-build.js",
+    "test": "node tools/test-parser.js",
+    "test:smoke": "node tools/run-electron.js tools/smoke-test.js",
+    "test:line": "node tools/run-electron.js tools/test-singleline.js",
+    "test:line-join": "node tools/run-electron.js tools/test-line-join.js",
+    "test:line-resize": "node tools/run-electron.js tools/test-line-resize.js",
+    "test:app": "node tools/run-electron.js tools/integration-test.js",
+    "test:boot": "node tools/run-electron.js tools/boot-check.js",
+    "shot": "node tools/run-electron.js tools/preview-shot.js",
+    "icon": "node tools/run-electron.js tools/make-icon.js",
+    "test:all": "npm run books && npm run test && npm run test:smoke && npm run test:line && npm run test:line-join && npm run test:line-resize && npm run test:app && npm run test:boot",
+    "books": "node tools/make-test-books.js"
+  },
+  "author": "山梨阅读器",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16"
+  },
+  "build": {
+    "appId": "com.shanli.reader",
+    "productName": "山梨阅读器",
+    "copyright": "Copyright © 2026 山梨阅读器",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "package.json",
+      "main.js",
+      "preload.js",
+      "menu.js",
+      "lib/**/*",
+      "renderer/**/*",
+      "assets/icon.ico",
+      "assets/icon.png"
+    ],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "山梨阅读器",
+      "artifactName": "山梨阅读器-${version}-安装版.${ext}",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico"
+    },
+    "portable": {
+      "artifactName": "山梨阅读器-${version}-便携版.${ext}",
+      "requestExecutionLevel": "user"
+    }
+  }
+}

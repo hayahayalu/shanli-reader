@@ -1,0 +1,21 @@
+# 仓库内统一用 LF 存储，检出时按平台自动转换
+* text=auto
+
+# Windows 批处理用 CRLF 更稳妥
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制资源，不要做换行符转换
+*.ico binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.zip binary
+*.exe binary
+
+# 这些要按文本处理
+*.js text
+*.json text
+*.css text
+*.html text
+*.md text

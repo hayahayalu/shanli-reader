@@ -1,0 +1,24 @@
+# 依赖
+node_modules/
+
+# 构建产物（electron-builder 输出，体积很大，不入库）
+dist/
+out/
+
+# 日志
+*.log
+npm-debug.log*
+
+# 打包 / 运行时可能产生的临时文件
+*.tmp
+*.bak
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# WorkBuddy 工具的内部工作数据（本地开发记录，非项目源码）
+.workbuddy/
